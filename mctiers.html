@@ -4,130 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PVPTiers</title>
-    <!-- 引入 3D 渲染引擎 -->
     <script src="https://cdn.jsdelivr.net/npm/skinview3d@3.0.0/bundles/skinview3d.bundle.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Noto Sans SC', sans-serif !important;
-            -webkit-font-smoothing: antialiased;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Noto Sans SC', sans-serif !important; }
+        body { background-color: #0a0a0a; color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1.5rem; overflow: hidden; }
+        
+        @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes cardIn { from { opacity: 0; transform: translateY(30px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-        body {
-            background-color: #0a0a0a;
-            color: #ffffff;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem 1.5rem;
-            overflow: hidden;
-        }
+        .主容器 { width: 100%; max-width: 1150px; max-height: 92vh; display: flex; flex-direction: column; background-color: #141414; border-radius: 24px; overflow: hidden; animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .顶部 { padding: 2.5rem 2rem 1.5rem; border-bottom: 2px solid #222; display: flex; flex-direction: column; align-items: center; position: relative; }
+        h1 { font-size: 2rem; font-weight: 900; letter-spacing: 1px; }
+        .状态区 { position: absolute; right: 2rem; bottom: 1.5rem; font-size: 0.85rem; color: #888; display: flex; align-items: center; gap: 6px; }
+        .状态点 { width: 8px; height: 8px; background: #10b981; border-radius: 50%; }
+        .表头 { display: grid; grid-template-columns: 120px 1fr; gap: 8px; padding: 1.2rem 2rem; background-color: #0a0a0a; color: #888; font-size: 0.85rem; font-weight: 700; text-align: center; }
+        .表头 > div { display: flex; align-items: center; justify-content: center; }
+        .表头 .玩家列 { justify-content: flex-start; padding-left: 10px; }
+        .滚动区 { flex: 1; overflow-y: auto; padding: 1.5rem; }
 
-        /* 整体容器出场动画 */
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(40px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* 卡片依次出场动画 */
-        @keyframes cardIn {
-            from { opacity: 0; transform: translateY(30px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .主容器 {
-            width: 100%;
-            max-width: 1150px;
-            max-height: 92vh;
-            display: flex;
-            flex-direction: column;
-            background-color: #141414;
-            border-radius: 24px;
-            overflow: hidden;
-            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        .顶部 {
-            padding: 2.5rem 2rem 1.5rem;
-            border-bottom: 2px solid #222222;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-        }
-
-        h1 {
-            font-size: 2rem;
-            font-weight: 900;
-            letter-spacing: 1px;
-        }
-
-        .状态区 {
-            position: absolute;
-            right: 2rem;
-            bottom: 1.5rem;
-            font-size: 0.85rem;
-            color: #888888;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .状态点 {
-            width: 8px;
-            height: 8px;
-            background: #10b981;
-            border-radius: 50%;
-        }
-
-        .表头 {
-            display: grid;
-            grid-template-columns: 120px 1fr;
-            gap: 8px;
-            padding: 1.2rem 2rem;
-            background-color: #0a0a0a;
-            color: #888888;
-            font-size: 0.85rem;
-            font-weight: 700;
-            text-align: center;
-        }
-
-        .表头 > div {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .表头 .玩家列 {
-            justify-content: flex-start;
-            padding-left: 10px;
-        }
-
-        .滚动区 {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1.5rem;
-        }
-
-        .行 {
-            display: grid;
-            grid-template-columns: 120px 1fr;
-            gap: 8px;
-            align-items: center;
-            padding: 1.5rem;
-            margin-bottom: 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            opacity: 0;
-            animation: cardIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            transition: transform 0.2s, opacity 0.2s;
-        }
-
-        /* 依次延迟出场，极度丝滑 */
+        .行 { display: grid; grid-template-columns: 120px 1fr; gap: 8px; align-items: center; padding: 1.5rem; margin-bottom: 16px; border-radius: 20px; cursor: pointer; opacity: 0; animation: cardIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; transition: transform 0.15s, opacity 0.15s; }
+        .行:hover { transform: scale(1.01); opacity: 0.9; }
         .行:nth-child(1) { animation-delay: 0.1s; }
         .行:nth-child(2) { animation-delay: 0.15s; }
         .行:nth-child(3) { animation-delay: 0.2s; }
@@ -135,246 +32,40 @@
         .行:nth-child(5) { animation-delay: 0.3s; }
         .行:nth-child(6) { animation-delay: 0.35s; }
         .行:nth-child(7) { animation-delay: 0.4s; }
-
-        .行:hover {
-            transform: scale(1.01) translateY(-2px);
-            opacity: 0.95;
-        }
-
-        .行.普通 { background-color: #222222; }
+        .行.普通 { background-color: #222; }
         .行.第一名 { background-color: #f5c842; }
         .行.第二名 { background-color: #9ca3af; }
         .行.第三名 { background-color: #f97316; }
+        .名次 { font-size: 2.2rem; font-weight: 900; font-style: italic; text-align: center; color: #fff !important; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
+        .玩家信息 { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+        .玩家名 { font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 14px; color: #fff !important; padding-left: 10px; width: 200px; flex-shrink: 0; }
 
-        .名次 {
-            font-size: 2.2rem;
-            font-weight: 900;
-            font-style: italic;
-            text-align: center;
-            color: #ffffff !important;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-        }
+        /* 3D 容器 */
+        .canvas-container { width: 46px; height: 46px; border-radius: 10px; background-color: #0a0a0a; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .canvas-container canvas { width: 200% !important; height: 200% !important; transform: translateY(10%); }
 
-        .玩家信息 {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-        }
-
-        .玩家名 {
-            font-size: 1.2rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            color: #ffffff !important;
-            padding-left: 10px;
-            width: 200px;
-            flex-shrink: 0;
-        }
-
-        /* 3D 渲染画布容器 */
-        .canvas-container {
-            width: 46px;
-            height: 46px;
-            border-radius: 10px;
-            background-color: #0a0a0a;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .canvas-container canvas {
-            width: 200% !important;
-            height: 200% !important;
-            transform: translateY(10%);
-        }
-
-        .数据区 {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 8px;
-            flex: 1;
-            margin-left: 20px;
-        }
-
-        .数据块 {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            padding: 6px 0;
-            border-radius: 10px;
-            background-color: rgba(0, 0, 0, 0.3);
-            width: 100%;
-        }
-
-        .数据块 .玩法名 {
-            font-size: 0.75rem;
-            color: #ffffff;
-            opacity: 0.8;
-            font-weight: 700;
-        }
-
-        .数据块 .等级值 {
-            font-size: 1rem;
-            font-weight: 800;
-        }
+        .数据区 { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; flex: 1; margin-left: 20px; }
+        .数据块 { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 0; border-radius: 10px; background-color: rgba(0,0,0,0.3); width: 100%; }
+        .数据块 .玩法名 { font-size: 0.75rem; color: #fff; opacity: 0.8; font-weight: 700; }
+        .数据块 .等级值 { font-size: 1rem; font-weight: 800; }
 
         /* 弹窗 */
-        .弹窗遮罩 {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(0, 0, 0, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-            z-index: 99;
-            backdrop-filter: blur(4px);
-        }
-
-        .弹窗遮罩.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .弹窗 {
-            width: 90%;
-            max-width: 440px;
-            background-color: #141414;
-            border-radius: 24px;
-            padding: 2.2rem;
-            text-align: center;
-            position: relative;
-            transform: scale(0.85) translateY(20px);
-            opacity: 0;
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s;
-        }
-
-        .弹窗遮罩.active .弹窗 {
-            transform: scale(1) translateY(0);
-            opacity: 1;
-        }
-
-        .关闭 {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            width: 32px;
-            height: 32px;
-            background-color: #222222;
-            border: none;
-            border-radius: 50%;
-            color: #888888;
-            cursor: pointer;
-            font-size: 1.1rem;
-        }
-
-        .big-canvas {
-            width: 100px;
-            height: 100px;
-            border-radius: 16px;
-            background-color: #0a0a0a;
-            margin: 0 auto 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        .big-canvas canvas {
-            width: 200% !important;
-            height: 200% !important;
-            transform: translateY(10%);
-        }
-
-        .玩家详情名 {
-            font-size: 1.6rem;
-            font-weight: 800;
-            color: #ffffff;
-            margin-bottom: 0.5rem;
-        }
-
-        .徽章 {
-            display: inline-block;
-            background-color: #222222;
-            color: #ffffff;
-            padding: 6px 16px;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-        }
-
-        .排名条 {
-            display: flex;
-            background-color: #0a0a0a;
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 1.5rem;
-            height: 60px;
-        }
-
-        .排名条 .左 {
-            background-color: #222222;
-            color: #ffffff;
-            font-size: 1.8rem;
-            font-weight: 800;
-            font-style: italic;
-            width: 90px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .排名条 .右 {
-            display: flex;
-            align-items: center;
-            padding-left: 16px;
-            font-weight: 700;
-            color: #ffffff;
-            flex: 1;
-            gap: 8px;
-            font-size: 1.05rem;
-        }
-
-        .排名条 .右 .pts {
-            color: #888888;
-            font-size: 0.9rem;
-            margin-left: auto;
-            margin-right: 16px;
-        }
-
-        .战绩网格 {
-            display: flex;
-            justify-content: space-between;
-            background-color: #0a0a0a;
-            border-radius: 12px;
-            padding: 1.4rem 0.5rem;
-        }
-
-        .战绩项 {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.9rem;
-            font-weight: 800;
-            flex: 1;
-            color: #ffffff !important;
-        }
-
-        .战绩项 span:first-child {
-            font-size: 0.8rem;
-            color: #888888;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
+        .弹窗遮罩 { position: fixed; inset: 0; background-color: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 99; backdrop-filter: blur(4px); }
+        .弹窗遮罩.active { opacity: 1; pointer-events: auto; }
+        .弹窗 { width: 90%; max-width: 440px; background-color: #141414; border-radius: 24px; padding: 2.2rem; text-align: center; position: relative; transform: scale(0.85) translateY(20px); opacity: 0; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s; }
+        .弹窗遮罩.active .弹窗 { transform: scale(1) translateY(0); opacity: 1; }
+        .关闭 { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; background-color: #222; border: none; border-radius: 50%; color: #888; cursor: pointer; font-size: 1.1rem; }
+        .big-canvas { width: 100px; height: 100px; border-radius: 16px; background-color: #0a0a0a; margin: 0 auto 1.2rem; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .big-canvas canvas { width: 200% !important; height: 200% !important; transform: translateY(10%); }
+        .玩家详情名 { font-size: 1.6rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem; }
+        .徽章 { display: inline-block; background-color: #222; color: #fff; padding: 6px 16px; border-radius: 50px; font-size: 0.9rem; font-weight: 700; margin-bottom: 1.5rem; }
+        .排名条 { display: flex; background-color: #0a0a0a; border-radius: 12px; overflow: hidden; margin-bottom: 1.5rem; height: 60px; }
+        .排名条 .左 { background-color: #222; color: #fff; font-size: 1.8rem; font-weight: 800; font-style: italic; width: 90px; display: flex; align-items: center; justify-content: center; }
+        .排名条 .右 { display: flex; align-items: center; padding-left: 16px; font-weight: 700; color: #fff; flex: 1; gap: 8px; font-size: 1.05rem; }
+        .排名条 .右 .pts { color: #888; font-size: 0.9rem; margin-left: auto; margin-right: 16px; }
+        .战绩网格 { display: flex; justify-content: space-between; background-color: #0a0a0a; border-radius: 12px; padding: 1.4rem 0.5rem; }
+        .战绩项 { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 0.9rem; font-weight: 800; flex: 1; color: #fff !important; }
+        .战绩项 span:first-child { font-size: 0.8rem; color: #888; font-weight: 700; text-transform: uppercase; }
 
         @media (max-width: 800px) {
             body { padding: 1rem 0.5rem; }
@@ -383,7 +74,7 @@
             .玩家信息 { flex-direction: column; align-items: flex-start; gap: 10px; }
             .玩家名 { width: auto; font-size: 1.1rem; gap: 10px; padding-left: 0; }
             .canvas-container { width: 36px; height: 36px; }
-            .数据区 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-left: 0; width: 100%; margin-top: 10px; }
+            .数据区 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-left: 0; width: 100%; }
             .数据块 .玩法名 { font-size: 0.7rem; }
             .数据块 .等级值 { font-size: 0.9rem; }
         }
@@ -392,7 +83,7 @@
 <body>
 
 <script>
-    // 直接读取 LittleSkin 官方材质直链
+    // 使用你提供的 LittleSkin TID
     const STEVE_SKIN = "https://littleskin.cn/textures/4710"; 
     const ALEX_SKIN = "https://littleskin.cn/textures/220103";
 </script>
